@@ -1,0 +1,205 @@
+class Zamestnanec
+  attr_reader :evidence
+  attr_accessor :name, :surname, :telephone, :email, :position, :note
+  def initialize(name, surname, telephone, email, position, note)
+    @name = name
+    @surname = surname
+    @telephone = telephone
+    @email = email
+    @position = position
+    @note = note
+  end
+  
+  def uprav_jmeno #je toto dobre???
+    puts "uved nove jmeno:"
+    name_new = gets
+    @evidence.fill(name_new,0)
+  end   
+  
+  def print_card
+    puts "name: #{@name}"
+    puts "surname: #{@surname}"
+    puts "telephone: #{@telephone}"
+    puts "email: #{@email}"
+    puts "note: #{@note}"
+  end  
+  
+end  
+  
+class Adresar  
+  
+  def initialize
+   @evidence = []
+  end
+    
+  def print_seznam
+    @evidence.each_with_index do |zamestnanec,i|
+      puts "#{i+1}. #{zamestnanec.name} #{zamestnanec.surname}"
+    end
+    puts "#{@evidence.length + 1}. Zpet do hlavniho menu"
+    puts "\nZadej cislo kontaktu : "; volba = gets.to_i
+    cislo_zamestnance(volba)
+  end 
+   
+
+  def cislo_zamestnance(volba)  
+    case volba
+      when 1..@evidence.length
+        print user_detail(volba)
+      when @evidence.length+1
+        main_menu
+      else
+        puts "Spatne cislo kontaktu !"  
+        print 'Zadej cislo kontaktu : '; volba = gets.to_i
+        return cislo_zamestnance(volba)  
+      end
+  end 
+  
+  def user_detail(volba)
+    puts "Jmeno     : #{@evidence[volba-1].name}"
+    puts "Prijmeni  : #{@evidence[volba-1].surname}"
+    puts "Telefon   : #{@evidence[volba-1].telephone}"
+    puts "Email     : #{@evidence[volba-1].email}"
+    puts "Pozice    : #{@evidence[volba-1].position}"
+    
+    menu_moznosti
+  end   
+  def pridej_noveho(zamestnanec)
+    @evidence << zamestnanec
+  end
+  
+  def vyhledej_jmeno
+    puts "zadej hledane"
+    keyword = gets
+    results = []
+    @evidence.each do |zamestnanec|
+      results << zamestnanec if zamestnanec.name(keyword)
+    end
+      puts results
+  end
+ 
+end
+
+def menu_moznosti
+  while (true)
+    puts "1. Upravit jmeno"
+    puts "2. Upravit prijmeni"
+    puts "3. Upravit telefon"
+    puts "4. Upravit email"
+    puts "5. Upravit poznamku"
+    puts "6. Smazat kontakt"
+    puts "7. Exportovat kontakt"
+    puts "8. Zpet na vsechny kontakty"
+    puts "zadej cislo upravy:"
+    volba = gets.to_i
+    
+    if((volba <= 8)&&(volba > 0))
+        break
+      else 
+      puts "Zadana operace neni v menu. Vyberte prosim jednu z nabizenych operaci."
+    end
+   end 
+     
+   case volba
+        when 1
+          print "Zadej nove jmeno pro \"#{@evidence[volba-1].name}\" #{@evidence[volba-1].surname} : "; new_name = gets.strip
+          @evidence[volba-1].name = new_name 
+          @evidence.user_detail(volba)
+        
+     
+     when '8'
+       print_seznam
+    end      
+end        
+          
+   
+def menu_vyhledat
+   while (true)
+    puts "1. Hledat podle jmena"
+    puts "2. Hledat podle prijmeni"
+    puts "3. Hledat podle telefonniho cisla"
+    puts "4. Hledat podle emailu"
+    puts "5. Zpet do hlavniho menu"
+    puts "zadej cislo:"
+    volba = gets.to_i
+    
+     if((volba <= 5)&&(volba > 0))
+        break
+      else 
+        puts "Zadana operace neni v menu. Vyberte prosim jednu z nabizenych operaci."
+     end
+    case volba
+      when 1
+      when 2  
+      when 3
+      when 4
+      when 5
+        main_menu
+    end      
+  end
+end
+
+
+def main_menu
+  while (true)
+    puts "1. Vsechny kontakty"
+    puts "2. Vyhledavani kontaktu" 
+    puts "3. Novy kontakt"
+    puts "4. Konec"
+    puts "zadej cislo:"
+    volba = gets.to_i
+    
+    if((volba <= 4)&&(volba > 0))
+        break
+      else 
+      puts "Zadana operace neni v menu. Vyberte prosim jednu z nabizenych operaci."
+    end
+  end
+  
+  evidence = Adresar.new
+  soubor = File.open("zdrojak.txt","r+")
+  while radek = soubor.gets
+    hodnoty_radku = radek.strip.split(";")
+    zamestnanec = Zamestnanec.new(hodnoty_radku[0],hodnoty_radku[1],hodnoty_radku[2],hodnoty_radku[3],hodnoty_radku[4],hodnoty_radku[5])
+    evidence.pridej_noveho(zamestnanec)
+  end
+    case volba
+      when 1
+       evidence.print_seznam
+       evidence.cislo_zamestnance
+       
+       menu_moznosti
+      
+      when 2       
+      evidence.vyhledej_jmeno
+      
+      when 3
+        puts "zadej jmeno"
+        name = gets
+        puts "prijmeni" 
+        surname = gets
+        puts "telefon" 
+        telephone = gets.to_i
+        puts "email" 
+        email = gets
+        puts "pozice" 
+        position = gets
+        puts "poznamka" 
+        note = gets
+        zamestnanec = Zamestnanec.new(name,surname,telephone,email,position,note)        
+        evidence.pridej_noveho(zamestnanec)
+        
+       
+          
+      when 4 then
+        puts "konec, nazdar"
+        exit       
+    end
+end
+
+#program
+begin
+  main_menu
+  
+  
+end
